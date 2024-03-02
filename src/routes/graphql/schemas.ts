@@ -1,10 +1,17 @@
 import { Type } from '@fastify/type-provider-typebox';
 import { PrismaClient } from '@prisma/client';
-import { GraphQLBoolean, GraphQLList, GraphQLObjectType, GraphQLSchema } from 'graphql';
+import {
+  GraphQLBoolean,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLSchema,
+} from 'graphql';
 import { ProfileType } from './types/profileType.js';
 import { UserType } from './types/userType.js';
 import { PostType } from './types/postType.js';
-import { MemberType } from './types/memberType.js';
+import { MemberType, MemberTypeIdEnum } from './types/memberType.js';
+import { UUIDType } from './types/uuid.js';
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
@@ -50,6 +57,72 @@ const rootQuery = new GraphQLObjectType({
       type: new GraphQLList(ProfileType),
       resolve: async (parent, args, context: PrismaClient) => {
         return await context.profile.findMany();
+      },
+    },
+    memberType: {
+      type: MemberType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(MemberTypeIdEnum),
+        },
+      },
+      resolve: async (parent, { id }: { id: string }, context: PrismaClient) => {
+        return await context.memberType.findUnique({
+          where: {
+            id,
+          },
+        });
+      },
+    },
+    post: {
+      type: PostType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (parent, { id }: { id: string }, context: PrismaClient) => {
+        const post = await context.post.findUnique({
+          where: {
+            id,
+          },
+        });
+        return post ? post : null;
+      },
+    },
+    user: {
+      type: UserType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (parent, { id }: { id: string }, context: PrismaClient) => {
+        const user = await context.user.findUnique({
+          where: {
+            id,
+          },
+          include: {
+            profile: true,
+          },
+        });
+        return user ? user : null;
+      },
+    },
+    profile: {
+      type: ProfileType,
+      args: {
+        id: {
+          type: new GraphQLNonNull(UUIDType),
+        },
+      },
+      resolve: async (parent, { id }: { id: string }, context: PrismaClient) => {
+        const profile = await context.profile.findUnique({
+          where: {
+            id,
+          },
+        });
+        return profile ? profile : null;
       },
     },
   },

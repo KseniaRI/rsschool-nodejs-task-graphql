@@ -10,10 +10,10 @@ export const MemberTypeIdEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
   description: 'basic or business type',
   values: {
-    BASIC: {
+    basic: {
       value: 'basic',
     },
-    BUSINESS: {
+    business: {
       value: 'business',
     },
   },

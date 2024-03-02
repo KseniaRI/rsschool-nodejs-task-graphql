@@ -8,6 +8,7 @@ import {
 import { UUIDType } from './uuid.js';
 import { PostType } from './postType.js';
 import { MemberTypeIdEnum } from './memberType.js';
+import { ProfileType } from './profileType.js';
 
 export const UserType = new GraphQLObjectType({
   name: 'User',
@@ -26,6 +27,9 @@ export const UserType = new GraphQLObjectType({
     },
     memberType: {
       type: new GraphQLNonNull(MemberTypeIdEnum),
+    },
+    profile: {
+      type: ProfileType,
     },
   },
 });
