@@ -2,9 +2,11 @@ import {
   GraphQLEnumType,
   GraphQLFloat,
   GraphQLInt,
+  GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
 } from 'graphql';
+import { ProfileType } from './profileType.js';
 
 export const MemberTypeIdEnum = new GraphQLEnumType({
   name: 'MemberTypeId',
@@ -21,7 +23,7 @@ export const MemberTypeIdEnum = new GraphQLEnumType({
 
 export const MemberType = new GraphQLObjectType({
   name: 'MemberType',
-  fields: {
+  fields: () => ({
     id: {
       type: new GraphQLNonNull(MemberTypeIdEnum),
     },
@@ -31,5 +33,8 @@ export const MemberType = new GraphQLObjectType({
     postsLimitPerMonth: {
       type: new GraphQLNonNull(GraphQLInt),
     },
-  },
+    profiles: {
+      type: new GraphQLNonNull(new GraphQLList(ProfileType)),
+    },
+  }),
 });

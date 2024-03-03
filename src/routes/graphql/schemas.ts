@@ -8,10 +8,10 @@ import {
   GraphQLSchema,
 } from 'graphql';
 import { ProfileType } from './types/profileType.js';
-import { UserType } from './types/userType.js';
 import { PostType } from './types/postType.js';
 import { MemberType, MemberTypeIdEnum } from './types/memberType.js';
 import { UUIDType } from './types/uuid.js';
+import { UserType } from './types/userType.js';
 
 export const gqlResponseSchema = Type.Partial(
   Type.Object({
@@ -34,7 +34,7 @@ export const createGqlResponseSchema = {
 
 const rootQuery = new GraphQLObjectType({
   name: 'Query',
-  fields: {
+  fields: () => ({
     memberTypes: {
       type: new GraphQLList(MemberType),
       resolve: async (parent, args, context: PrismaClient) => {
@@ -50,7 +50,16 @@ const rootQuery = new GraphQLObjectType({
     users: {
       type: new GraphQLList(UserType),
       resolve: async (parent, args, context: PrismaClient) => {
-        return await context.user.findMany();
+        return await context.user.findMany({
+          include: {
+            posts: true,
+            profile: {
+              include: {
+                memberType: true,
+              },
+            },
+          },
+        });
       },
     },
     profiles: {
@@ -103,7 +112,12 @@ const rootQuery = new GraphQLObjectType({
             id,
           },
           include: {
-            profile: true,
+            posts: true,
+            profile: {
+              include: {
+                memberType: true,
+              },
+            },
           },
         });
         return user ? user : null;
@@ -125,7 +139,7 @@ const rootQuery = new GraphQLObjectType({
         return profile ? profile : null;
       },
     },
-  },
+  }),
 });
 
 const rootMutation = new GraphQLObjectType({
